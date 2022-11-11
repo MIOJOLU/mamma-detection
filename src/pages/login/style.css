@@ -1,0 +1,11 @@
+body{
+    height: 100vh;
+}
+
+img{
+    width: 10rem;
+}
+.divider{
+    border-left: 6px solid darkgray;
+    height: 100%;
+}

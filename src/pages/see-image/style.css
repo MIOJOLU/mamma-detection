@@ -1,0 +1,16 @@
+.logo{
+    height: 40px;
+}
+
+.banner{
+    padding: 4px;
+}
+
+.img{
+    width: 600px;
+}
+
+.exclamation{
+    color: #ffc107!important;
+    font-size: 12px;
+}   

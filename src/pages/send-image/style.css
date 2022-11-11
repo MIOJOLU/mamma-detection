@@ -1,0 +1,32 @@
+.pattern{
+    height: 20px;
+}
+
+.banner{
+    background-image: url('../../assets/Thur.svg');
+    opacity: 90%;
+    background-position: center;
+}
+
+.logo{
+    height: 5em;
+}
+
+.text-justify{
+    font-size: 10pt;
+    text-align: justify;
+}
+
+label, .form-text{
+    font-size: 10pt !important;
+}
+
+.error{
+    color: red;
+    font-size: 8pt;
+}
+
+.status{
+    color: green;
+    font-size: 10pt;
+}
