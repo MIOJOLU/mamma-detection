@@ -30,3 +30,8 @@ label, .form-text{
     color: green;
     font-size: 10pt;
 }
+
+.invalid{
+    color: #dc3545;
+    font-size: 8pt;
+}

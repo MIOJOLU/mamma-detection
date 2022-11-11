@@ -3,6 +3,7 @@ const environment = 'http://44.198.5.220:8000/mamografias/';
 onload = () => {
     visualization('ADD');
 }
+let submited = false;
 
 
 async function submitImage(body){
@@ -30,45 +31,87 @@ async function submitImage(body){
 }
 
 function getImage(){
+    submited = true;
     document.getElementById('status').classList.add('d-none')
     const label = document.getElementById('label').value;
     const file = document.getElementById('file').files[0];
-    if (file) {
-        let reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => {
-            const body = {
-                "imagem": reader.result.split(',')[1],
-                "rotulo": label
+    if (!label){
+        document.getElementById('validation-label').classList.remove('d-none');
+    }
+    if (!file){
+        document.getElementById('validation-file').classList.remove('d-none');
+    }else if (file) {
+            if (file.type === 'image/jpeg'){
+            let reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+                const body = {
+                    "imagem": reader.result.split(',')[1],
+                    "rotulo": label
+                }
+                submited = false;
+                //submitImage(body);
             }
-            submitImage(body);
-        }
-        reader.onerror = () => {
-            
+            reader.onerror = () => {
+                
+            }
+        }else{
+            document.getElementById('validation-file').classList.remove('d-none');
         }
     }
 }
 
 async function findResults(){
+    submited = true;
     const label = document.getElementById('label-find').value;
-    const init = {
-        method: 'GET',
-        headers: {
-            "Content-Type": "application/json",
-          },
-        mode: 'cors'
-    }
-    const res = await fetch(`${environment}${label}`, init)
-        .then(retorno => {
-            return retorno.json();
-         })
-        .catch(error => console.log(error))
-
-    if (res.classificado){
-        localStorage.setItem('result', JSON.stringify(res));
-        window.location.href = '../see-image/index.html'
+    if (label !== ''){
+        const init = {
+            method: 'GET',
+            headers: {
+                "Content-Type": "application/json",
+              },
+            mode: 'cors'
+        }
+        const res = await fetch(`${environment}${label}`, init)
+            .then(retorno => {
+                return retorno.json();
+             })
+            .catch(error => {
+                if (error){
+                    document.getElementById('validation-id').classList.add('d-none');
+                }
+            })
+    
+        if (res){
+            if (res.classificado){
+                localStorage.setItem('result', JSON.stringify(res));
+                window.location.href = '../see-image/index.html'
+            }else{
+                document.getElementById('status-verify').classList.remove('d-none');
+            }
+        }
     }else{
-        document.getElementById('status-verify').classList.remove('d-none');
+        document.getElementById('validation-id').classList.remove('d-none');
+    }
+}
+
+function checkValidation(type){
+    if (type === 'ADD'){
+        const label = document.getElementById('label').value;
+        const file = document.getElementById('file').files[0];
+        if (submited){
+            if (label){
+                document.getElementById('validation-label').classList.add('d-none');
+            }
+            if (file && file.type === 'image/jpeg'){
+                document.getElementById('validation-file').classList.add('d-none');
+            }
+        }
+    }else{
+        const id = document.getElementById('label-find').value;
+        if (submited && id !== ''){
+            document.getElementById('validation-id').classList.add('d-none');
+        }
     }
 }
 
@@ -83,11 +126,27 @@ function visualization(type){
     <form>
         <div class="mb-2">
           <label for="exampleInputEmail1" class="form-label">Nome</label>
-          <input type="text" class="form-control form-control-sm" id="label" >
+          <input 
+            type="text" 
+            class="form-control 
+            form-control-sm" 
+            id="label"
+            onchange="checkValidation('ADD')" >
+          <div class="d-none invalid" id="validation-label">
+            É necessário adicionar um nome.
+        </div>
         </div>
         <div class="mb-2">
           <label for="exampleInputPassword1" class="form-label">Arquivo</label>
-          <input type="file" class="form-control form-control-sm" id="file">
+          <input 
+          type="file" 
+          class="form-control 
+          form-control-sm" 
+          onchange="checkValidation('ADD')"
+          id="file">
+          <div class="d-none invalid" id="validation-file">
+            É necessário adicionar um arquivo do tipo JPEG ou JPG.
+        </div>
         </div>
         <div class="d-grid status">
             <button 
@@ -120,7 +179,14 @@ function visualization(type){
     <form>
         <div class="mb-2">
             <label for="exampleInputEmail1" class="form-label">ID</label>
-            <input type="text" class="form-control form-control-sm" id="label-find" >
+            <input 
+                onchange= "checkValidation('EDIT')"
+                type="text" 
+                class="form-control form-control-sm" 
+                id="label-find" >
+            <div class="d-none invalid" id="validation-id">
+            É necessário adicionar um ID válido.
+        </div>
         </div>
         <div class="d-grid">
             <button 
